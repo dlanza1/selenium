@@ -30,7 +30,7 @@ namespace OpenQA.Selenium
     /// <summary>
     /// A base class representing a driver for a web browser.
     /// </summary>
-    public class WebDriver : IWebDriver, ISearchContext, IJavaScriptExecutor, IFindsElement, ITakesScreenshot, ISupportsPrint, IActionExecutor, IAllowsFileDetection, IHasCapabilities, IHasCommandExecutor, IHasSessionId, ICustomDriverCommandExecutor, IHasVirtualAuthenticator
+    public class WebDriver : IWebDriver, ISearchContext, IJavaScriptExecutor, IFindsElement, ITakesScreenshot, ISupportsPrint, IActionExecutor, IAllowsFileDetection, IHasCapabilities, IHasCommandExecutor, IHasSessionId, ICustomDriverCommandExecutor, IHasVirtualAuthenticator, IHasDownloads
     {
         /// <summary>
         /// The default command timeout for HTTP requests in a RemoteWebDriver instance.
@@ -1090,6 +1090,38 @@ namespace OpenQA.Selenium
             parameters.Add("isUserVerified", verified);
 
             this.Execute(driverCommandToExecute: DriverCommand.SetUserVerified, parameters);
+        }
+
+        /// <summary>
+        /// Retrieves the downloadable files as a map of file names and their corresponding URLs.
+        /// </summary>
+        /// <returns>A map containing file names as keys and URLs as values.</returns>
+        public Dictionary<string, List<string>> GetDownloadableFiles()
+        {
+            Response commandResponse = this.Execute(DriverCommand.GetDownloadableFiles, null);
+            return (Dictionary<string, List<string>>)commandResponse.Value;
+        }
+
+        /// <summary>
+        /// Downloads a file with the specified file name.
+        /// </summary>
+        /// <param name="fileName">the name of the file to be downloaded</param>
+        /// <returns>A map of file names to file paths for the downloaded file.</returns>
+        public Dictionary<string, string> DownloadFile(string fileName)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("name", fileName);
+
+            Response commandResponse = this.Execute(DriverCommand.GetDownloadableFiles, parameters);
+            return (Dictionary<string, string>)commandResponse.Value;
+        }
+
+        /// <summary>
+        /// Deletes all downloadable files.
+        /// </summary>
+        public void DeleteDownloadableFiles()
+        {
+            this.Execute(DriverCommand.GetDownloadableFiles, null);
         }
     }
 }
